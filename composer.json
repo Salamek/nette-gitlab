@@ -26,5 +26,6 @@
     "psr-0": {
       "Salamek\\": "src/"
     }
-  }
+  },
+  "minimum-stability": "dev"
 }
