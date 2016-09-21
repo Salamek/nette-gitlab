@@ -2,24 +2,39 @@
 
 namespace Salamek\Gitlab;
 
+use Gitlab\Api\AbstractApi;
+use Gitlab\Client;
+use Gitlab\Model\Label;
+use Nette\Object;
+use Gitlab\Model\Project;
+use Gitlab\Model\Issue;
+use Nette\Utils\Strings;
+use Tracy\Debugger;
 
 /**
  * Class TemplatedEmail
  * @package Salamek\TemplatedEmail
  */
-class Gitlab extends Nette\Object
+class Gitlab extends Object
 {
     private $gitlabUrl;
 
     private $gitlabToken;
 
-    private $projectPath;
+    private $projectName;
 
-    public function __construct($gitlabUrl, $gitlabToken, $projectPath)
+    /** @var Label[]|null */
+    private $labels = null;
+
+    private $projectId = null;
+
+    private $client = null;
+
+    public function __construct($gitlabUrl, $gitlabToken, $projectName)
     {
-        $this->gitlabUrl = $gitlabUrl;
+        $this->setGitlabUrl($gitlabUrl);
         $this->gitlabToken = $gitlabToken;
-        $this->projectPath = $projectPath;
+        $this->projectName = $projectName;
     }
 
     /**
@@ -27,6 +42,10 @@ class Gitlab extends Nette\Object
      */
     public function setGitlabUrl($gitlabUrl)
     {
+        if (!Strings::endsWith($gitlabUrl, '/'))
+        {
+            $gitlabUrl = $gitlabUrl.'/';
+        }
         $this->gitlabUrl = $gitlabUrl;
     }
 
@@ -39,19 +58,148 @@ class Gitlab extends Nette\Object
     }
 
     /**
-     * @param mixed $projectPath
+     * @param mixed $projectName
      */
-    public function setProjectPath($projectPath)
+    public function setProjectName($projectName)
     {
-        $this->projectPath = $projectPath;
+        $this->projectName = $projectName;
     }
 
+    /**
+     * @return Client|null
+     */
+    public function getClient()
+    {
+        if (is_null($this->client))
+        {
+            $this->client = new Client($this->gitlabUrl);
+            $this->client->authenticate($this->gitlabToken, Client::AUTH_URL_TOKEN);
+        }
+        
+        return $this->client;
+    }
+
+    /**
+     * @return null|integer
+     * @throws \Exception
+     */
+    public function getProjectId()
+    {
+        if (is_null($this->projectId))
+        {
+            foreach ($this->getClient()->api('projects')->accessible() AS $project)
+            {
+                if ($project['path_with_namespace'] == $this->projectName)
+                {
+                    $this->projectId = $project['id'];
+                    break;
+                }
+            }
+
+            if (is_null($this->projectId))
+            {
+                throw new \Exception(sprintf('Project %s was not found', $this->projectName));
+            }
+
+        }
+
+        return $this->projectId;
+    }
+
+    public function getProject()
+    {
+        return new Project($this->getProjectId(), $this->getClient());
+    }
+
+    /**
+     * @param $title
+     * @param array $parameters
+     */
+    public function createIssue($title, array $parameters = [])
+    {
+        $project = $this->getProject();
+        $project->createIssue($title, $parameters);
+    }
     
-
-    private function connect()
+    /**
+     * @param int $page
+     * @param int $perPage
+     * @param array $params
+     * @return Issue[]
+     * @throws \Exception
+     */
+    public function getIssues($page = 1, $perPage = AbstractApi::PER_PAGE, array $params = [])
     {
-        $client = new \Gitlab\Client($this->gitlabUrl);
-        $client->authenticate($this->gitlabToken, \Gitlab\Client::AUTH_URL_TOKEN);
+        $issues =  $this->getClient()->api('issues')->all($this->getProjectId(), $page, $perPage, $params);
+        $return = [];
+
+        foreach ($issues AS $issue)
+        {
+            foreach($issue['labels'] AS &$label)
+            {
+                $label = $this->getLabels()[$label];
+            }
+
+            $return[] = Issue::fromArray($this->getClient(), $this->getProject(), $issue);
+        }
+
+        return $return;
     }
 
+    /**
+     * @return Label[]
+     * @throws \Exception
+     */
+    public function getLabels()
+    {
+        if (is_null($this->labels))
+        {
+            $issues = $this->getClient()->api('projects')->labels($this->getProjectId());
+
+            $return = [];
+            foreach ($issues AS $issue)
+            {
+                $return[$issue['name']] = Label::fromArray($this->getClient(), $this->getProject(), $issue);
+            }
+
+            $this->labels = $return;
+        }
+
+        return $this->labels;
+    }
+    
+    /**
+     * @param $id
+     * @return Issue
+     */
+    public function getIssue($id)
+    {
+        $data = $this->getClient()->api('issues')->show($this->getProjectId(), $id);
+
+        foreach($data['labels'] AS &$label)
+        {
+            $label = $this->getLabels()[$label];
+        }
+
+        return Issue::fromArray($this->getClient(), $this->getProject(), $data);
+    }
+
+    /**
+     * @return array
+     */
+    public function getIssuesStats()
+    {
+        $return = ['opened' => 0, 'closed' => 0, 'last' => []];
+        $data = $this->getIssues();
+        foreach ($data AS $row) {
+            if ($row['state'] == 'opened') {
+                $return['opened']++;
+            } else {
+                $return['closed']++;
+            }
+        }
+
+        $return['last'] = array_shift($data);
+        return $return;
+    }
 }

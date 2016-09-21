@@ -20,10 +20,10 @@ class GitlabExtension extends Nette\DI\CompilerExtension
 
 
         $builder->addDefinition($this->prefix('gitlab'))
-            ->setClass('Salamek\Gitlab\Gitlab', [$config['gitlabUrl'], $config['gitlabToken'], $config['projectPath']])
+            ->setClass('Salamek\Gitlab\Gitlab', [$config['gitlabUrl'], $config['gitlabToken'], $config['projectName']])
             ->addSetup('setGitlabUrl', [$config['gitlabUrl']])
             ->addSetup('setGitlabToken', [$config['gitlabToken']])
-            ->addSetup('setProjectPath', [$config['projectPath']]);
+            ->addSetup('setProjectName', [$config['projectName']]);
     }
 
 
@@ -45,9 +45,9 @@ class GitlabExtension extends Nette\DI\CompilerExtension
     public function getConfig(array $defaults = [], $expand = true)
     {
         $defaults = [
-            'gitlabUrl' => 'https://gitlab.com',
+            'gitlabUrl' => 'https://gitlab.com/api/v3',
             'gitlabToken' => null,
-            'projectPath' => null,
+            'projectName' => null,
         ];
 
         return parent::getConfig($defaults, $expand);

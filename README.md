@@ -17,8 +17,8 @@ Then you have to register extension in `config.neon`.
 extensions:
 	gitlab: Salamek\TemplatedEmail\DI\GitlabExtension
 
-templatedEmail:
-    gitlabUrl: https://gitlab.com
+gitlab:
+    gitlabUrl: https://gitlab.com/api/v3
     gitlabToken: GITLAB_TOKEN
     projectPath: PATH_TO_YOUR_PROJECT
 ```
