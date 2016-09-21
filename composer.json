@@ -17,7 +17,7 @@
   ],
   "require": {
     "nette/di": "~2.4",
-    "m4tthumphrey/php-gitlab-api": "dev-master"
+    "m4tthumphrey/php-gitlab-api": "~7.13.1@dev"
   },
   "require-dev": {
     "nette/tester": "@dev"
@@ -26,6 +26,5 @@
     "psr-0": {
       "Salamek\\": "src/"
     }
-  },
-  "minimum-stability": "dev"
+  }
 }
