@@ -1,0 +1,30 @@
+{
+  "name": "salamek/nette-gitlab",
+  "type": "library",
+  "description": "This is a simple gitlab integration into Nette Framework",
+  "keywords": [
+    "nette",
+    "git",
+    "gitlab"
+  ],
+  "license": [
+    "LGPL-3.0"
+  ],
+  "authors": [
+    {
+      "name": "Adam Schubert"
+    }
+  ],
+  "require": {
+    "nette/di": "~2.4",
+    "m4tthumphrey/php-gitlab-api": "dev-master"
+  },
+  "require-dev": {
+    "nette/tester": "@dev"
+  },
+  "autoload": {
+    "psr-0": {
+      "Salamek\\": "src/"
+    }
+  }
+}
