@@ -5,7 +5,7 @@ namespace Salamek\Gitlab;
 use Gitlab\Api\AbstractApi;
 use Gitlab\Client;
 use Gitlab\Model\Label;
-use Nette\Object;
+use Nette;
 use Gitlab\Model\Project;
 use Gitlab\Model\Issue;
 use Nette\Utils\Strings;
@@ -15,21 +15,34 @@ use Tracy\Debugger;
  * Class TemplatedEmail
  * @package Salamek\TemplatedEmail
  */
-class Gitlab extends Object
+class Gitlab
 {
+    use Nette\SmartObject;
+
+    /** @var string */
     private $gitlabUrl;
 
+    /** @var string */
     private $gitlabToken;
 
+    /** @var string */
     private $projectName;
 
     /** @var Label[]|null */
     private $labels = null;
 
+    /** @var null|string */
     private $projectId = null;
 
+    /** @var null|Client */
     private $client = null;
 
+    /**
+     * Gitlab constructor.
+     * @param string $gitlabUrl
+     * @param string $gitlabToken
+     * @param string $projectName
+     */
     public function __construct($gitlabUrl, $gitlabToken, $projectName)
     {
         $this->setGitlabUrl($gitlabUrl);

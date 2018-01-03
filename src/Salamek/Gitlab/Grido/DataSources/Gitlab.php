@@ -3,14 +3,16 @@
 namespace Salamek\Gitlab\Grido\DataSources;
 
 use Grido\DataSources\IDataSource;
-use Nette\Object;
+use Nette;
 use Tracy\Debugger;
 
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
-class Gitlab extends Object implements IDataSource
+class Gitlab implements IDataSource
 {
+    use Nette\SmartObject;
+
     /** @var int */
     private $page = 1;
 
