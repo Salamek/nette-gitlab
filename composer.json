@@ -17,7 +17,7 @@
   ],
   "require": {
     "nette/di": "~2.4",
-    "m4tthumphrey/php-gitlab-api": "~7.13.1@dev"
+    "m4tthumphrey/php-gitlab-api": "^9.10.0"
   },
   "require-dev": {
     "nette/tester": "@dev"
