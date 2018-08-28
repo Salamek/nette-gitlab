@@ -15,7 +15,7 @@ Then you have to register extension in `config.neon`.
 
 ```yaml
 extensions:
-	gitlab: Salamek\TemplatedEmail\DI\GitlabExtension
+	gitlab: Salamek\Gitlab\DI\GitlabExtension
 
 gitlab:
     gitlabUrl: https://gitlab.com/api/v3
