@@ -7,8 +7,8 @@ use Nette\DI\Compiler;
 use Nette\DI\Configurator;
 
 /**
- * Class TemplatedEmailExtension
- * @package Salamek\TemplatedEmail\DI
+ * Class GitlabExtension
+ * @package Salamek\Gitlab\DI
  */
 class GitlabExtension extends Nette\DI\CompilerExtension
 {
