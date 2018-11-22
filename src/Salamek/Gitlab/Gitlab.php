@@ -12,8 +12,8 @@ use Nette\Utils\Strings;
 use Tracy\Debugger;
 
 /**
- * Class TemplatedEmail
- * @package Salamek\TemplatedEmail
+ * Class Gitlab
+ * @package Salamek\Gitlab
  */
 class Gitlab
 {
