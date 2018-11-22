@@ -1,4 +1,4 @@
-# Nette Files
+# Nette Gitlab
 
 This is a simple integration of gitlab into [Nette Framework](http://nette.org/)
 
